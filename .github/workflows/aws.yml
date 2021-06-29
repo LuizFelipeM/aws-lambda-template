@@ -38,15 +38,15 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
         profile_name: default
-        project_name: <your project name>
+        project_name: truck-control
         runtime: nodejs14.x
-        s3_bucket: <your bucket name>
+        s3_bucket: github-truck-control
     
     # Deploy main.py to AWS
     - name: AWS Lambda Deploy
       uses: appleboy/lambda-action@v0.0.4
       with:
         # name of my AWS Lambda Function
-        function_name: <your function name>
+        function_name: test
         # contains all the files in my github repository
-        zip_file: <your function name>.zip
+        zip_file: test.zip
