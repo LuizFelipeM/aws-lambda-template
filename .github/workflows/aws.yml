@@ -10,42 +10,37 @@ on:
   pull_request:
     branches: [ master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    # does this mean that the files in my github repo are accessible by this YAML file?
-    - uses: actions/checkout@v2
-    
-    # installs a version of python, but I need this if deploying to a severless NodeJS Lambda?
-    - name: Set up NodeJS
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-    
-    # credentials to connect to AWS
-    - name: Configure AWS credentials from Production account
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
-    
-    - name: Zip script
-      run: zip -r test.zip .
-    
-    # Deploy main.py to AWS
-    - name: AWS Lambda Deploy
-      uses: appleboy/lambda-action@v0.0.4
-      with:
-        # name of my AWS Lambda Function
-        function_name: test
-        # contains all the files in my github repository
-        zip_file: test.zip
+      # Checks-out to repository
+      - uses: actions/checkout@v2
+      
+      - name: Set up NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # - name: Node Build
+      #   run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Configure AWS credentials from Production account
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
+      
+      - name: SAM Deploy
+        uses: r0zar/sam-deploy-action@v1.4
+        env:
+          TEMPLATE: 'template.yaml'
+          AWS_STACK_NAME: truck-control-${{ github.actor }}
+          AWS_REGION: 'us-east-1'
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEPLOY_BUCKET: ${{ secrets.AWS_DEPLOY_BUCKET }}
