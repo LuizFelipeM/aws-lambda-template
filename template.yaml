@@ -8,7 +8,7 @@ Description: >
 Parameters:
   CodeUri:
     Type: String
-    Default: functions/
+    Default: build/
   StageName:
     Type: String
     Default: Prod
@@ -31,18 +31,31 @@ Resources:
       DefaultRouteSettings:
         ThrottlingBurstLimit: 50
 
-  Function:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  NewPcbFunction:
+    Type: AWS::Serverless::Function
     Properties:
       FunctionName: 
-      CodeUri:  !Sub ${CodeUri}/hello-world/
+      CodeUri:  !Sub ${CodeUri}/newPcb/
       Events:
         HelloWorld:
-          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi
           Properties:
             ApiId: !Ref HttpApi
-            Path: /
-            Method: GET
+            Path: /pcb
+            Method: POST
+
+  # Function:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     FunctionName: 
+  #     CodeUri:  !Sub ${CodeUri}/hello-world/
+  #     Events:
+  #       HelloWorld:
+  #         Type: HttpApi
+  #         Properties:
+  #           ApiId: !Ref HttpApi
+  #           Path: /
+  #           Method: GET
 
 Outputs:
   HttpApiUrl:

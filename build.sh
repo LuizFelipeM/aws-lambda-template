@@ -1,21 +1,32 @@
 #!/bin/bash
 for currentDir in functions/*/ functions/**/*/ ; do
-    realPath=$(realpath $currentDir)/
-    parentDir=$(basename $PWD)
+    fullPath=$(realpath $currentDir)/
 
-    cd $realPath
+    cd $fullPath
+
+    parentDir=$(basename $PWD)
+    functionPath=../../../build/$parentDir
 
     if [ ! -d ../../../build/ ]
     then
         mkdir ../../../build/
     fi
 
-    if [ ! -d ../../../build/$parentDir ]
+    if [ ! -d $functionPath ]
     then
-        mkdir ../../../build/$parentDir
+        mkdir $functionPath
     fi
 
-    mv build ../../../build/$parentDir
+    if [ $(ls -1 package.json 2>/dev/null | wc -l) != 0 ]
+    then
+        npm run build
+        rm -rf $functionPath
+        mv -f build $functionPath
+        cp package.json $functionPath
+        cp package-lock.json $functionPath
+    else 
+        echo $parentDir package.json not found
+    fi
 
-    cd ${realPath//$currentDir/}
+    cd ${fullPath//$currentDir/}
 done

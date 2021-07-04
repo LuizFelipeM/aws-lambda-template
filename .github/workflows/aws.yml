@@ -2,13 +2,15 @@ name: CD
       
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
-on:
+on: push
   # when there is a push to the master
-  push:
-    branches: [ master ]
+  # push:
+  #   branches:
+      - master
   # when there is a pull request to the master
-  pull_request:
-    branches: [ master ]
+  # pull_request:
+  #   branches:
+  #     - master
 
 jobs:
   build:
@@ -22,20 +24,69 @@ jobs:
         with:
           node-version: '14'
 
-      # - name: Node Build
-      #   run: npm run build
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+      - uses: aws-actions/setup-sam@v1
 
-      - name: SAM Deploy
-        uses: r0zar/sam-deploy-action@v1.4
-        env:
-          AWS_STACK_NAME: truck-control
-          AWS_REGION: 'us-east-1'
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEPLOY_BUCKET: ${{ secrets.AWS_DEPLOY_BUCKET }}
-          AWS_BUCKET_PREFIX: truck-control
+      - name: Building lambda functions of application
+        run: |
+          #!/bin/bash
+          for currentDir in functions/*/ functions/**/*/ ; do
+              fullPath=$(realpath $currentDir)/
+
+              cd $fullPath
+
+              parentDir=$(basename $PWD)
+              functionPath=../../../build/$parentDir
+
+              if [ ! -d ../../../build/ ]
+              then
+                  mkdir ../../../build/
+              fi
+
+              if [ ! -d $functionPath ]
+              then
+                  mkdir $functionPath
+              fi
+
+              if [ $(ls -1 package.json 2>/dev/null | wc -l) != 0 ]
+              then
+                  npm run build
+                  rm -rf $functionPath
+                  mv -f build $functionPath
+                  cp package.json $functionPath
+                  cp package-lock.json $functionPath
+              else 
+                  echo $parentDir package.json not found
+              fi
+
+              cd ${fullPath//$currentDir/}
+          done
+
+      - name: SAM application build
+        run: sam build
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: "3.8"
+  #     - uses: aws-actions/setup-sam@v1
+
+  #     - name: SAM application build
+  #       run: sam build
+
+      # - name: SAM Deploy
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: 'us-east-1'
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      # - name: SAM application deployment
+      #   run: sam deploy
