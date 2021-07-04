@@ -6,7 +6,7 @@ on: push
   # when there is a push to the master
   # push:
   #   branches:
-      - master
+  #    - master
   # when there is a pull request to the master
   # pull_request:
   #   branches:
