@@ -34,7 +34,7 @@ Resources:
   NewPcbFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: 
+      FunctionName: NewPcb
       CodeUri:  !Sub ${CodeUri}/newPcb/
       Events:
         HelloWorld:

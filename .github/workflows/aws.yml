@@ -2,15 +2,15 @@ name: CD
       
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
-on: push
+on:
   # when there is a push to the master
-  # push:
-  #   branches:
-  #    - master
+  push:
+    branches:
+     - master
   # when there is a pull request to the master
-  # pull_request:
-  #   branches:
-  #     - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
