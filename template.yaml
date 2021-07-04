@@ -5,36 +5,50 @@ Description: >
 
   Sample SAM Template for truck-control
   
+Parameters:
+  CodeUri:
+    Type: String
+    Default: functions/
+  StageName:
+    Type: String
+    Default: Prod
+
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
+    Handler: app.handler
+    Runtime: nodejs14.x
     Timeout: 3
 
 Resources:
-  HelloWorldFunction:
+  # Project Http API
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      Description: |
+        Http API resource used by all Truck Control lambda functions
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 50
+
+  Function:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: HelloWorld
-      CodeUri: hello-world/
-      Handler: app.lambdaHandler
-      Runtime: nodejs14.x
+      FunctionName: 
+      CodeUri:  !Sub ${CodeUri}/hello-world/
       Events:
         HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /hello
-            Method: get
+            ApiId: !Ref HttpApi
+            Path: /
+            Method: GET
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  HttpApiUrl:
+    Description: URL of your API endpoint
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/${StageName}/'
+  HttpApiId:
+    Description: Api id of HttpApi
+    Value:
+      Ref: HttpApi
