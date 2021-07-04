@@ -19,6 +19,7 @@ for currentDir in functions/*/ functions/**/*/ ; do
 
     if [ $(ls -1 package.json 2>/dev/null | wc -l) != 0 ]
     then
+        npm i
         npm run build
         rm -rf $functionPath
         mv -f build $functionPath
