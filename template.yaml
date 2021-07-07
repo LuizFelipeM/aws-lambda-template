@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  truck-control
+  aws-lambda-template
 
-  Sample SAM Template for truck-control
+  Sample SAM Template for aws-lambda-template
   
 Parameters:
   CodeUri:

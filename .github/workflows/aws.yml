@@ -6,7 +6,7 @@ on:
   # when there is a push to the master
   push:
     branches:
-     - master
+      - master
 
 jobs:
   build:
