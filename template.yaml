@@ -13,7 +13,6 @@ Parameters:
     Type: String
     Default: Prod
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Handler: app.handler
@@ -21,41 +20,27 @@ Globals:
     Timeout: 3
 
 Resources:
-  # Project Http API
   HttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: !Ref StageName
       Description: |
-        Http API resource used by all Truck Control lambda functions
+        Example Http API
       DefaultRouteSettings:
         ThrottlingBurstLimit: 50
 
-  NewPcbFunction:
+  ExampleFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: NewPcb
-      CodeUri:  !Sub ${CodeUri}/newPcb/
+      FunctionName: Example
+      CodeUri:  !Sub ${CodeUri}/example/
       Events:
-        HelloWorld:
+        Example:
           Type: HttpApi
           Properties:
             ApiId: !Ref HttpApi
-            Path: /pcb
-            Method: POST
-
-  # Function:
-  #   Type: AWS::Serverless::Function
-  #   Properties:
-  #     FunctionName: 
-  #     CodeUri:  !Sub ${CodeUri}/hello-world/
-  #     Events:
-  #       HelloWorld:
-  #         Type: HttpApi
-  #         Properties:
-  #           ApiId: !Ref HttpApi
-  #           Path: /
-  #           Method: GET
+            Path: /example
+            Method: GET
 
 Outputs:
   HttpApiUrl:
