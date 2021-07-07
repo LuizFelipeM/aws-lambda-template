@@ -29,6 +29,7 @@ jobs:
 
       - name: Building lambda functions of application
         run: ./build.sh
+        shell: bash
 
       - name: SAM application build
         run: sam build
