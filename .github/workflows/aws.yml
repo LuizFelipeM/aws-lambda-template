@@ -28,56 +28,19 @@ jobs:
       - uses: aws-actions/setup-sam@v1
 
       - name: Building lambda functions of application
-        run: |
-          #!/bin/bash
-          for currentDir in functions/*/ functions/**/*/ ; do
-              fullPath=$(realpath $currentDir)/
-
-              cd $fullPath
-
-              parentDir=$(basename $PWD)
-              functionPath=../../../build/$parentDir
-
-              if [ ! -d ../../../build/ ]
-              then
-                  mkdir ../../../build/
-              fi
-
-              if [ ! -d $functionPath ]
-              then
-                  mkdir $functionPath
-              fi
-
-              if [ $(ls -1 package.json 2>/dev/null | wc -l) != 0 ]
-              then
-                  npm i
-                  npm run build
-                  rm -rf $functionPath
-                  mv -f build $functionPath
-                  cp package.json $functionPath
-                  cp package-lock.json $functionPath
-              else 
-                  echo $parentDir package.json not found
-              fi
-
-              cd ${fullPath//$currentDir/}
-          done
+        run: ./build.sh
 
       - name: SAM application build
         run: sam build
+      
+      # - uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: 'us-east-1'
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post build
-        run: echo $(ls)
-
-      - name: SAM Deploy
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-region: 'us-east-1'
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: SAM application deployment
-        run: sam deploy
+      # - name: SAM application deployment
+      #   run: sam deploy
 
   # deploy:
   #   runs-on: ubuntu-latest
