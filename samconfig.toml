@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "truck-control"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-9aejc9nxm0im"
+s3_prefix = "truck-control"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
